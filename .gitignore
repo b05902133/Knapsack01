@@ -1,0 +1,5 @@
+*.o
+*.d
+*.log
+knapsack01
+tags
