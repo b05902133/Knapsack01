@@ -141,8 +141,8 @@ int Knapsack01::upperbound( double profit, double capacity, size_t level )
      }
      else
      {
-       profit   += static_cast<double>( item.profit ) / item.weight * capacity;
-       capacity = 0;
+       profit += static_cast<double>( item.profit ) / item.weight * capacity;
+       break;
      }
   }
   return ceil( profit );
