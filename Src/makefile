@@ -23,7 +23,7 @@ ${program}: ${OBJS}
 %.o: %.d
 
 %.d: %.cpp
-	${CXX} ${CXXFLAGS} -MM -MT "$(subst .d,.o,$@) $@" > $@
+	${CXX} ${CXXFLAGS} -MM -MT "$(subst .d,.o,$@) $@" $< > $@
 
 clean:
 	rm *.{d,o}
