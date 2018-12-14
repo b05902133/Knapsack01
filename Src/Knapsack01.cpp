@@ -1,6 +1,8 @@
 #include "Knapsack01.h"
 
 #include <algorithm>
+#include <cmath>
+using namespace std;
 
 // public member functions
 /*!
@@ -36,7 +38,7 @@ int Knapsack01::init()
 
   for( const Item &item : mItems )
   {
-     if( capacity - item.weight > 0 )
+     if( capacity > item.weight )
      {
        profit   += item.profit;
        capacity -= item.weight;
@@ -48,8 +50,23 @@ int Knapsack01::init()
 /*!
  *  Get the upper bound of the subproblem.
  */
-int Knapsack01::upperbound( int profitCurrent, int level )
+int Knapsack01::upperbound( double profit, double capacity, size_t level )
 {
-  return 0;
+  for( size_t i = level ; i < mItems.size() ; ++i )
+  {
+     Item &item = mItems[i];
+
+     if( capacity > item.weight )
+     {
+       profit   += item.profit;
+       capacity -= item.weight;
+     }
+     else
+     {
+       profit   += static_cast<double>( item.profit ) / item.weight * capacity;
+       capacity = 0;
+     }
+  }
+  return ceil( profit );
 }
 // private member functions

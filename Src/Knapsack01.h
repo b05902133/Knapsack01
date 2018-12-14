@@ -16,7 +16,7 @@ class Knapsack01
   private:
 
     int init      ();
-    int upperbound( int profitCurrent, int level );
+    int upperbound( double profit, double capacity, std::size_t level );
 
     struct Item
     {
