@@ -7,8 +7,9 @@ class Knapsack01
 {
   public:
 
-    inline void setCapacity( int capacity );
-    inline void addItem    ( int profit,   int weight );
+    inline void setCapacity ( int capacity  );
+    inline void setItemNum  ( int itemNum   ); 
+    inline void addItem     ( int profit,   int weight );
 
     int solve();
 
@@ -26,9 +27,11 @@ class Knapsack01
 };
 
 // public inline member functions
-inline void Knapsack01::setCapacity( int capacity )
+inline void Knapsack01::setCapacity ( int capacity )
 { mCapacity = capacity; }
-inline void Knapsack01::addItem    ( int profit,   int weight )
+inline void Knapsack01::setItemNum  ( int itemNum   )
+{ mItems.reserve( itemNum ); }
+inline void Knapsack01::addItem     ( int profit,   int weight )
 { mItems.push_back( Item{ profit, weight } ); }
 // end public inline member functions
 
