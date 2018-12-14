@@ -15,6 +15,9 @@ class Knapsack01
 
   private:
 
+    int init      ();
+    int upperbound( int profitCurrent, int level );
+
     struct Item
     {
       int profit;
