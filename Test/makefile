@@ -23,8 +23,9 @@ all: ${testResults}
 	done
 
 ${testResults}: testcase = $(patsubst ${testResultDir}/%.log,${testcaseDir}/%.input,$@)
-${testResults}: ${testResultDir}
-	{ ulimit -t ${timeLimit} -v ${memLimit}; ${program} < ${testcase} > $@; }
+${testResults}: ${testResultDir} ${program}
+	ulimit -t ${timeLimit} -v ${memLimit}; \
+	${program} < ${testcase} > $@
 
 ${testResultDir}:
 	mkdir $@
