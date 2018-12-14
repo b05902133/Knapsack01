@@ -2,6 +2,8 @@
 #define KNAPSACK01_H
 
 #include <vector>
+#include <stack>
+#include <tuple>
 
 class Knapsack01
 {
@@ -15,8 +17,14 @@ class Knapsack01
 
   private:
 
+    using NextDecision = std::tuple<size_t,bool,int>; // level, value, upper bound
+
     int init      ();
     int upperbound( double profit, double capacity, std::size_t level );
+
+    void  addDecision ();
+    int   evalProfit  ();
+    int   evalCapcity ();
 
     struct Item
     {
@@ -27,6 +35,11 @@ class Knapsack01
     int mCapacity;
 
     std::vector<Item> mItems;
+
+    int mLowerBound;
+
+    std::stack<NextDecision>  mNextDecisions;
+    std::vector<bool>         mDecisions;
 };
 
 // public inline member functions

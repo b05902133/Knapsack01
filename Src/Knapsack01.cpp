@@ -19,76 +19,37 @@ using namespace std;
  */
 int Knapsack01::solve()
 {
-  using NextDecision = tuple<size_t,bool,int>; // level, value, upper bound
+  mLowerBound = init();
 
-  stack<NextDecision> nextDecisions;
-  vector<bool>        decisions;
+  addDecision();
 
-  int profit      = 0;
-  int capacity    = mCapacity;
-  int lowerBound  = init();
-
-  NextDecision decision0 = make_tuple( 0, false,  upperbound( profit, capacity , 1 ) );
-  NextDecision decision1 = make_tuple( 0, true,   upperbound( profit + mItems.front().profit, capacity - mItems.front().weight, 1 ) );
-
-  if( get<2>( decision0 ) > get<2>( decision1 ) )
+  while( !mNextDecisions.empty() )
   {
-    if( get<2>( decision1 ) > lowerBound ) nextDecisions.push( decision1 );
-    if( get<2>( decision0 ) > lowerBound ) nextDecisions.push( decision0 );
-  }
-  else
-  {
-    if( get<2>( decision0 ) > lowerBound ) nextDecisions.push( decision0 );
-    if( get<2>( decision1 ) > lowerBound ) nextDecisions.push( decision1 );
-  }
+    NextDecision decision = mNextDecisions.top();
 
-  while( !nextDecisions.empty() )
-  {
-    NextDecision decision = nextDecisions.top();
-
-    nextDecisions.pop();
+    mNextDecisions.pop();
 
     size_t  level       = get<0>( decision );
     bool    value       = get<1>( decision );
     int     upperBound  = get<2>( decision );
     Item    &item       = mItems[level];
 
-    if( upperBound < lowerBound ) continue;
-    if( value && ( capacity < item.weight ) ) continue;
+    if( upperBound < mLowerBound ) continue;
+    if( value && ( evalCapcity() < item.weight ) ) continue;
 
-    for( size_t i = decisions.size() ; i > level ; --i )
-       decisions.pop_back();
+    for( size_t i = mDecisions.size() ; i > level ; --i )
+       mDecisions.pop_back();
 
-    decisions.push_back( value );
+    mDecisions.push_back( value );
 
-    profit = 0;
-
-    for( size_t i = 0 ; i < decisions.size() ; ++i )
-       if( decisions[i] ) profit += mItems[i].profit;
-
-    if( decisions.size() == mItems.size() )
+    if( mDecisions.size() == mItems.size() )
     {
-      lowerBound = max( profit, lowerBound );
+      mLowerBound = max( evalProfit(), mLowerBound );
+      continue;
     }
-    else
-    {
-      Item          &item     = mItems[decisions.size()];
-      NextDecision  decision0 = make_tuple( decisions.size(), false,  upperbound( profit, capacity , decisions.size() + 1 ) );
-      NextDecision  decision1 = make_tuple( decisions.size(), true,   upperbound( profit + item.profit, capacity - item.weight, decisions.size() + 1 ) );
-
-      if( get<2>( decision0 ) > get<2>( decision1 ) )
-      {
-        if( get<2>( decision1 ) > lowerBound ) nextDecisions.push( decision1 );
-        if( get<2>( decision0 ) > lowerBound ) nextDecisions.push( decision0 );
-      }
-      else
-      {
-        if( get<2>( decision0 ) > lowerBound ) nextDecisions.push( decision0 );
-        if( get<2>( decision1 ) > lowerBound ) nextDecisions.push( decision1 );
-      }
-    }
+    addDecision();
   }
-  return lowerBound;
+  return mLowerBound;
 }
 // end public member functions
 
@@ -146,5 +107,47 @@ int Knapsack01::upperbound( double profit, double capacity, size_t level )
      }
   }
   return ceil( profit );
+}
+
+void Knapsack01::addDecision()
+{
+  Item          &item     = mItems[mDecisions.size()];
+  int           profit    = evalProfit();
+  int           capacity  = evalCapcity();
+  NextDecision  decision0 = make_tuple( mDecisions.size(), false,  upperbound( profit, capacity , mDecisions.size() + 1 ) );
+  NextDecision  decision1 = make_tuple( mDecisions.size(), true,   upperbound( profit + item.profit, capacity - item.weight, mDecisions.size() + 1 ) );
+
+  if( get<2>( decision0 ) > get<2>( decision1 ) )
+  {
+    if( get<2>( decision1 ) > mLowerBound ) mNextDecisions.push( decision1 );
+    if( get<2>( decision0 ) > mLowerBound ) mNextDecisions.push( decision0 );
+  }
+  else
+  {
+    if( get<2>( decision0 ) > mLowerBound ) mNextDecisions.push( decision0 );
+    if( get<2>( decision1 ) > mLowerBound ) mNextDecisions.push( decision1 );
+  }
+}
+
+int Knapsack01::evalProfit()
+{
+  int profit = 0;
+
+  for( size_t i = 0 ; i < mDecisions.size() ; ++i )
+     if( mDecisions[i] )
+       profit += mItems[i].profit;
+
+  return profit;
+}
+
+int Knapsack01::evalCapcity()
+{
+  int capacity = mCapacity;
+
+  for( size_t i = 0 ; i < mDecisions.size() ; ++i )
+     if( mDecisions[i] )
+       capacity -= mItems[i].weight;
+
+  return capacity;
 }
 // private member functions
