@@ -18,17 +18,15 @@ class Knapsack01
 
     struct NextDecision
     {
-      size_t  level;
-      bool    value;
-      int     upperBound;
+      std::size_t level;
+      bool        value;
+      int         upperBound;
     };
 
     int init      ();
     int upperbound( double profit, double capacity, std::size_t level );
 
-    void  addDecision ();
-    int   evalProfit  ();
-    int   evalCapcity ();
+    void addDecision( int profit, int capacity, std::size_t level );
 
     struct Item
     {
