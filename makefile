@@ -13,7 +13,7 @@ all: debug
 release debug:
 	${MAKE} -C ${srcDir} $@
 
-test: debug
+test: release
 	${MAKE} -C ${testDir}
 
 tags:

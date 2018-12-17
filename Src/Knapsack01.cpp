@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <cmath>
 #include <stack>
-#include <tuple>
 
 #ifndef NDEBUG
 #include <iostream>
@@ -25,22 +24,18 @@ int Knapsack01::solve()
 
   while( !mNextDecisions.empty() )
   {
-    NextDecision decision = mNextDecisions.top();
+    NextDecision  decision  = mNextDecisions.top();
+    Item          &item     = mItems[decision.level];
 
     mNextDecisions.pop();
 
-    size_t  level       = get<0>( decision );
-    bool    value       = get<1>( decision );
-    int     upperBound  = get<2>( decision );
-    Item    &item       = mItems[level];
+    if( decision.upperBound < mLowerBound ) continue;
+    if( decision.value && ( evalCapcity() < item.weight ) ) continue;
 
-    if( upperBound < mLowerBound ) continue;
-    if( value && ( evalCapcity() < item.weight ) ) continue;
-
-    for( size_t i = mDecisions.size() ; i > level ; --i )
+    for( size_t i = mDecisions.size() ; i > decision.level ; --i )
        mDecisions.pop_back();
 
-    mDecisions.push_back( value );
+    mDecisions.push_back( decision.value );
 
     if( mDecisions.size() == mItems.size() )
     {
@@ -114,18 +109,18 @@ void Knapsack01::addDecision()
   Item          &item     = mItems[mDecisions.size()];
   int           profit    = evalProfit();
   int           capacity  = evalCapcity();
-  NextDecision  decision0 = make_tuple( mDecisions.size(), false,  upperbound( profit, capacity , mDecisions.size() + 1 ) );
-  NextDecision  decision1 = make_tuple( mDecisions.size(), true,   upperbound( profit + item.profit, capacity - item.weight, mDecisions.size() + 1 ) );
+  NextDecision  decision0 = NextDecision{ mDecisions.size(), false,  upperbound( profit, capacity , mDecisions.size() + 1 ) };
+  NextDecision  decision1 = NextDecision{ mDecisions.size(), true,   upperbound( profit + item.profit, capacity - item.weight, mDecisions.size() + 1 ) };
 
-  if( get<2>( decision0 ) > get<2>( decision1 ) )
+  if( decision0.upperBound > decision1.upperBound )
   {
-    if( get<2>( decision1 ) > mLowerBound ) mNextDecisions.push( decision1 );
-    if( get<2>( decision0 ) > mLowerBound ) mNextDecisions.push( decision0 );
+    if( decision1.upperBound > mLowerBound ) mNextDecisions.push( decision1 );
+    if( decision0.upperBound > mLowerBound ) mNextDecisions.push( decision0 );
   }
   else
   {
-    if( get<2>( decision0 ) > mLowerBound ) mNextDecisions.push( decision0 );
-    if( get<2>( decision1 ) > mLowerBound ) mNextDecisions.push( decision1 );
+    if( decision0.upperBound > mLowerBound ) mNextDecisions.push( decision0 );
+    if( decision1.upperBound > mLowerBound ) mNextDecisions.push( decision1 );
   }
 }
 

@@ -3,7 +3,6 @@
 
 #include <vector>
 #include <stack>
-#include <tuple>
 
 class Knapsack01
 {
@@ -17,7 +16,12 @@ class Knapsack01
 
   private:
 
-    using NextDecision = std::tuple<size_t,bool,int>; // level, value, upper bound
+    struct NextDecision
+    {
+      size_t  level;
+      bool    value;
+      int     upperBound;
+    };
 
     int init      ();
     int upperbound( double profit, double capacity, std::size_t level );
